@@ -7,11 +7,26 @@ import asyncio
 from decouple import config
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 
 UPLOAD_FOLDER = config("UPLOAD_FOLDER")
 DOMAIN_NAME = config("DOMAIN_NAME")
+
+
+# utils functions
+def get_response(message, response, code, has_error) -> JSONResponse:
+
+    return JSONResponse(
+        content={
+            "hasError": has_error,
+            "statusCode": code,
+            "message": message,
+            "response": response,
+        },
+        status_code=code,
+    )
 
 
 @repeat_every(seconds=86400, wait_first=True)
@@ -60,21 +75,25 @@ async def generate_unique_name():
         random_string = generate_random_string()
         if random_string not in existing_names:
             os.mkdir(os.path.join(os.getcwd(), UPLOAD_FOLDER, random_string))
-            return {"unique_name": random_string}
+            return get_response("successfull", random_string, 200, False)
 
 
 @app.post("/qupload/files/")
 async def upload_file(file: UploadFile = File(...), unique_name: str = Form(...)):
+    if not os.path.isdir(os.path.join(os.getcwd(), UPLOAD_FOLDER, unique_name)):
+        return get_response("Invalid unique name", None, 404, True)
     file_path = os.path.join(os.getcwd(), UPLOAD_FOLDER, unique_name, file.filename)
     file_content = file.file.read()
     with open(file_path, "wb") as f:
         f.write(file_content)
-    return {"message": "File uploaded successfully"}
+    return get_response("successfull", None, 200, False)
 
 
-@app.get("/qupload/files/")
+@app.get("/qupload/files/{unique_name}")
 async def list_files(unique_name: str):
+    if not os.path.isdir(os.path.join(os.getcwd(), UPLOAD_FOLDER, unique_name)):
+        return get_response("Invalid unique name", None, 404, True)
     file_path = os.path.join(os.getcwd(), UPLOAD_FOLDER, unique_name)
     files = os.listdir(file_path)
     files = [f"{DOMAIN_NAME}/qupload-media/{unique_name}/{file}" for file in files]
-    return {"files": files}
+    return get_response("successfull", files, 200, False)
