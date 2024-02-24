@@ -2,7 +2,7 @@ FROM python:3.10-slim-buster
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-RUN mkdir /var/log/makemypass
+RUN mkdir /var/log/qupload
 RUN mkdir /app/media
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
