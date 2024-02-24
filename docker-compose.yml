@@ -1,0 +1,16 @@
+version: '3'
+services:
+  makemypass:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: makemypass
+    image: makemypass
+    restart: always
+    ports:
+      - "8004:8000"
+    volumes:
+      - /var/log/makemypass:/var/log/makemypass
+      - /var/www/makemypass/media:/app/media
+    env_file:
+      - .env

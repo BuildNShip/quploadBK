@@ -54,7 +54,7 @@ def generate_random_string():
     return "".join(random.choice(characters) for _ in range(5))
 
 
-@app.post("/unique-name/")
+@app.post("/qupload/get-unique-name/")
 async def generate_unique_name():
     existing_names = set(os.listdir(UPLOAD_FOLDER))
     while True:
@@ -64,7 +64,7 @@ async def generate_unique_name():
             return {"unique_name": random_string}
 
 
-@app.post("/files/")
+@app.post("/qupload/files/")
 async def upload_file(file: UploadFile = File(...), unique_name: str = Form(...)):
     file_path = os.path.join(os.getcwd(), UPLOAD_FOLDER, unique_name, file.filename)
     file_content = file.file.read()
@@ -73,7 +73,7 @@ async def upload_file(file: UploadFile = File(...), unique_name: str = Form(...)
     return {"message": "File uploaded successfully"}
 
 
-@app.get("/files/")
+@app.get("/qupload/files/")
 async def list_files(unique_name: str):
     file_path = os.path.join(os.getcwd(), UPLOAD_FOLDER, unique_name)
     files = os.listdir(file_path)
