@@ -1,26 +1,50 @@
 import os
 import string
 import random
+import time
+import shutil
+import asyncio
 from decouple import config
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_utils.tasks import repeat_every
 
-origins = [
-    "http://localhost:8000",
-]
+UPLOAD_FOLDER = config("UPLOAD_FOLDER")
+DOMAIN_NAME = config("DOMAIN_NAME")
 
-app = FastAPI()
+
+@repeat_every(seconds=86400, wait_first=True)
+def delete_old_folder():
+    current_time = time.time()
+    for item in os.listdir(UPLOAD_FOLDER):
+        item_path = os.path.join(UPLOAD_FOLDER, item)
+        creation_time = os.path.getctime(item_path)
+        age_seconds = current_time - creation_time
+        if age_seconds >= 86400:
+            print(f"Deleting {item_path}")
+            shutil.rmtree(item_path)
+
+
+@asynccontextmanager
+async def startup(app: FastAPI):
+    try:
+        await delete_old_folder()
+        yield
+    except asyncio.CancelledError:
+        print("Coroutine was cancelled.")
+
+
+app = FastAPI(lifespan=startup)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins="*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-UPLOAD_FOLDER = config("UPLOAD_FOLDER")
-DOMAIN_NAME = config("DOMAIN_NAME")
 
 os.makedirs(os.path.join(os.getcwd(), UPLOAD_FOLDER), exist_ok=True)
 
