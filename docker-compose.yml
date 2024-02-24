@@ -8,7 +8,7 @@ services:
     image: qupload
     restart: always
     ports:
-      - "8004:8000"
+      - "8005:8000"
     volumes:
       - /var/log/qupload:/var/log/qupload
       - /var/www/qupload/media:/app/media
