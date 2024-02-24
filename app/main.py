@@ -43,6 +43,7 @@ def delete_old_folder():
 @asynccontextmanager
 async def startup(app: FastAPI):
     try:
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
         await delete_old_folder()
         yield
     except asyncio.CancelledError:
@@ -60,9 +61,6 @@ app.add_middleware(
 )
 
 
-os.makedirs(os.path.join(os.getcwd(), UPLOAD_FOLDER), exist_ok=True)
-
-
 def generate_random_string():
     characters = string.ascii_letters + string.digits
     return "".join(random.choice(characters) for _ in range(5))
@@ -74,7 +72,7 @@ async def generate_unique_name():
     while True:
         random_string = generate_random_string()
         if random_string not in existing_names:
-            os.mkdir(os.path.join(os.getcwd(), UPLOAD_FOLDER, random_string))
+            os.mkdir(os.path.join(UPLOAD_FOLDER, random_string))
             return get_response("successfull", random_string, 200, False)
 
 
