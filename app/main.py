@@ -22,7 +22,6 @@ def delete_old_folder():
         creation_time = os.path.getctime(item_path)
         age_seconds = current_time - creation_time
         if age_seconds >= 86400:
-            print(f"Deleting {item_path}")
             shutil.rmtree(item_path)
 
 
@@ -77,4 +76,5 @@ async def upload_file(file: UploadFile = File(...), unique_name: str = Form(...)
 async def list_files(unique_name: str):
     file_path = os.path.join(os.getcwd(), UPLOAD_FOLDER, unique_name)
     files = os.listdir(file_path)
+    files = [f"{DOMAIN_NAME}/qupload-media/{unique_name}/{file}" for file in files]
     return {"files": files}
