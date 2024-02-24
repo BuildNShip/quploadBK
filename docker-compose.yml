@@ -1,16 +1,16 @@
 version: '3'
 services:
-  makemypass:
+  qupload:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: makemypass
-    image: makemypass
+    container_name: qupload
+    image: qupload
     restart: always
     ports:
       - "8004:8000"
     volumes:
-      - /var/log/makemypass:/var/log/makemypass
-      - /var/www/makemypass/media:/app/media
+      - /var/log/qupload:/var/log/qupload
+      - /var/www/qupload/media:/app/media
     env_file:
       - .env
