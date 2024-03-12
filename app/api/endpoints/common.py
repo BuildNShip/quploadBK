@@ -33,9 +33,9 @@ async def upload_file(file: UploadFile = File(...), unique_name: str = Form(...)
 
 @router.get("/files/{unique_name}")
 async def list_files(unique_name: str):
-    if not os.path.isdir(os.path.join(os.getcwd(), settings.UUPLOAD_FOLDER, unique_name)):
+    if not os.path.isdir(os.path.join(os.getcwd(), settings.UPLOAD_FOLDER, unique_name)):
         return CustomResponse(general_message="Invalid unique name").get_failure_response()
-    file_path = os.path.join(os.getcwd(), settings.UUPLOAD_FOLDER, unique_name)
+    file_path = os.path.join(os.getcwd(), settings.UPLOAD_FOLDER, unique_name)
     files = os.listdir(file_path)
     files = [f"{settings.DOMAIN_NAME}/qupload-media/{unique_name}/{file}" for file in files]
     return CustomResponse(response={'files': files}).get_success_response()

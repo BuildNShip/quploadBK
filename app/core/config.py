@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from decouple import config as decouple_conf
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
