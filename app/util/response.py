@@ -47,7 +47,7 @@ class CustomResponse:
         if not isinstance(self.general_message, list):
             self.general_message = [self.general_message]
 
-        self.message.update({"general.py": self.general_message})
+        self.message.update({"general": self.general_message})
 
     def get_success_response(self) -> JSONResponse:
         """
@@ -136,7 +136,7 @@ class WSCustomResponse:
         if not isinstance(self.general_message, list):
             self.general_message = [self.general_message]
 
-        self.message.update({"general.py": self.general_message})
+        self.message.update({"general": self.general_message})
 
     async def get_success_response(self) -> None:
         """
